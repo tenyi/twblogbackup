@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Built-By: Tseng Teng-Yi
+Main-Class: tenyi.util.html.BlogBackupForm
+Class-Path: htmlparser.jar
+
