@@ -9,7 +9,7 @@ import org.htmlparser.util.ParserException;
 
 /**
  * 
- * @author 曾騰毅
+ * @author 鳥毅
  * @version 1.0
  */
 public class XuiteExtractor extends AbstractBlogExtractor {
