@@ -4,7 +4,7 @@ import org.htmlparser.util.ParserException;
 
 /**
  * 
- * @author Tenyi 曾騰毅
+ * @author Tenyi 鳥毅
  * @version 1.0
  */
 public class BlogExtractor {

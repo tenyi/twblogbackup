@@ -8,7 +8,7 @@ import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
  * 
  * @author 王建興qing 
  * 十月 11 2006, 01:44:33 
- * modified by 曾騰毅 2006/10/13
+ * modified by 鳥毅 2006/10/13
  */
 public class RollerReader
 {
