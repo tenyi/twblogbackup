@@ -8,23 +8,17 @@ import org.htmlparser.util.ParserException;
  * @version 1.0
  */
 public class BlogExtractor {
-	
 //	public static void main(String[] args) {
 //		try {
-//			new BlogExtractor().go(
-//					"http://blog.xuite.net/efchang/network");
-//					//"http://blog.xuite.net/anti_ms/index");
-//					//"http://blog.xuite.net/tenyi/program");
+//			new BlogExtractor().go(...);
 //		} catch (ParserException e) {
 //			e.printStackTrace();
 //		}
 //	}
-
-	public void go(String blogtype, String blogname, String blogentry) throws ParserException {
- 		if (blogentry.toLowerCase().startsWith("http://blog.xuite.net/")) {
-			XuiteExtractor xe = new XuiteExtractor();
-			xe.extractPages( blogentry, "rss", 20);
-		}
-	}
-	
+    public void go(String blogtype, String blogentry, int numberPerPage, String saveDirectory, String saveType)
+            throws ParserException, IllegalAccessException, ClassNotFoundException, InstantiationException {
+        AbstractBlogExtractor extractor = null;
+        extractor = (AbstractBlogExtractor) Class.forName("tenyi.util.html."+blogtype + "Extractor").newInstance();
+        extractor.extractPages(blogentry, numberPerPage, saveDirectory, saveType);
+    }
 }

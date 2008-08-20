@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package tenyi.util.html;
 
 import org.htmlparser.Node;
@@ -8,18 +11,16 @@ import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
 
 /**
- * 
  * @author 鳥毅
- * @version 1.0
+ *
  */
-public class XuiteExtractor extends AbstractBlogExtractor {
+public class BloggerExtractor extends AbstractBlogExtractor {
 
     @Override
     public void extractPages(String blogentry, int numberPerPage, String saveDirectory, String saveType)
             throws ParserException {
         int page = 0;
-        this.saveDirectory = saveDirectory;
-       if (blogentry.endsWith("/")) {
+        if (blogentry.endsWith("/")) {
             // 不要最後的 '/'
             blogentry = blogentry.substring(0, blogentry.length() - 1);
         }
@@ -32,6 +33,10 @@ public class XuiteExtractor extends AbstractBlogExtractor {
         BlogPage bp = getBlogContent(lastArticleURL, blogentry);
         // 最後一則為
         while (bp.previousUrl != null) {
+//			if(bp.previousUrl.equalsIgnoreCase("http://blog.xuite.net/efchang/network/9398180"))
+//			{
+//				System.out.println();
+//			}
             bp = getBlogContent(bp.previousUrl, blogentry);
             blogList.add(bp);
 
@@ -61,13 +66,12 @@ public class XuiteExtractor extends AbstractBlogExtractor {
     protected BlogPage getBlogContent(String url, String blogentry)
             throws ParserException {
         BlogPage blogPage = new BlogPage();
-        blogPage.url = url;
         String bodyHtml = getBodyHtml(url);
 
         // 文章 <div class="blogbody">
         blogPage.content = getDivContentHtml(bodyHtml, "blogbody");
-//        blogPage.content = blogPage.content.substring(
-//                "<div class=\"blogbody\"><br><br>".length(), blogPage.content.length() - "<br><br></div>".length());
+        blogPage.content = blogPage.content.substring(
+                "<div class=\"blogbody\"><br><br>".length(), blogPage.content.length() - "<br><br></div>".length());
         //System.out.println(blogPage.content);
         // 標題 <span class="titlename">
         blogPage.title = getSpanContentText(bodyHtml, "titlename");

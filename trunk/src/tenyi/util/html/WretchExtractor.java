@@ -7,7 +7,7 @@ public class WretchExtractor extends AbstractBlogExtractor {
 
 
 	@Override
-	public void extractPages(String blogentry, String outputtype, int nth) throws ParserException {
+	public void extractPages(String blogentry, int numberPerPage, String saveDirectory, String saveType) throws ParserException {
 		// TODO: 未完成
 		if (blogentry.endsWith("/")) {
 			// 不要最後的 '/'
@@ -19,13 +19,14 @@ public class WretchExtractor extends AbstractBlogExtractor {
 		blogdescription = getDivContentText(bodyHtml, "description");
 
 		// Wretch提供列表功能
-		ArrayList<String> list = getBlogLists(blogentry);
+		//ArrayList<String> list = getBlogLists(blogentry);
 
 		//BlogPage bp = getBlogContent(lastArticleURL, blogentry);
 
 		// System.out.println(lastArticleURL);
 		// System.out.println(content);
-		System.out.println("共:" + blogList.size());
+		System.out.println("共:" + blogList.size()+" 篇");
+		
 		rssOut(blogentry, blogList);
 	}
 
