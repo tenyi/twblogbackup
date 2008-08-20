@@ -20,115 +20,155 @@ import org.htmlparser.util.ParserException;
 
 public abstract class AbstractBlogExtractor {
 	ArrayList<BlogPage> blogList = new ArrayList<BlogPage>();
-
 	String blogtitle;
-
 	String blogdescription;
+	String saveDirectory;
 
-	public void extract(String blogentry) throws ParserException {
-		extractPages(blogentry, "rss", 0);		
+	// public void extract(String blogentry) throws ParserException {
+	// extractPages(blogentry, "rss", 0);
+	// }
+
+	public static String getNowTime(String timeFormat) {
+		SimpleDateFormat lformat = new SimpleDateFormat(timeFormat);
+		Calendar now = Calendar.getInstance();
+		String nowstr = lformat.format(now.getTime());
+		return nowstr;
 	}
-		
-    public static String getNowTime(String timeFormat) {
-        SimpleDateFormat lformat = new SimpleDateFormat(timeFormat);
-        Calendar now = Calendar.getInstance();
-        String nowstr = lformat.format(now.getTime());
-        return nowstr;
-    }
 
-    public static String getNotTime() {
-        return getNowTime("MM/dd/yyyy hh:mm:ss");
-    }
-    
+	public static String getNowTime() {
+		return getNowTime("MM/dd/yyyy hh:mm:ss");
+	}
+
 	/**
 	 * 
 	 * @param blogentry
-	 * @param nth 多少篇一個檔案 0表示只有一個檔
-	 * @throws ParserException
+	 * @param numberPerPage
+	 *            多少篇一個檔案 0表示只有一個檔
+	 * @param saveDirectory
+	 * @param saveType
+	 * @throws org.htmlparser.util.ParserException
 	 */
-	public abstract void extractPages(String blogentry, String outputtype, int nth) throws ParserException;
+	public abstract void extractPages(String blogentry, int numberPerPage,
+			String saveDirectory, String saveType) throws ParserException;
 
 	protected abstract BlogPage getBlogContent(String url, String blogentry)
 			throws ParserException;
 
 	/**
 	 * <a href="http://www.sixapart.com/movabletype/docs/mtimport">MT格式</a>
+	 * 
 	 * @param blogentry
 	 * @param bpList
 	 */
-	protected void mtOut(String author, String blogentry, ArrayList<BlogPage> bpList) {
-		mtOutPages(author, blogentry, bpList, "");
+	protected void mtOut(String author, String blogentry,
+			ArrayList<BlogPage> bpList) {
+		mtOutPages(author, blogentry, bpList, "1");
 	}
-	
-	protected void mtOutPages(String author, String blogentry, ArrayList<BlogPage> bpList, String page) {
+
+	protected void mtOutPages(String author, String blogentry,
+			ArrayList<BlogPage> bpList, String page) {
 		int size = bpList.size();
-		int iPage= Integer.parseInt(page);
-		int lastIndex=blogentry.lastIndexOf('/')+1;
+		int iPage = Integer.parseInt(page);
+		int lastIndex = blogentry.lastIndexOf('/') + 1;
 		String blogname = blogentry.substring(lastIndex, blogentry.length());
-		String filename = String.format("%1$s%2$03d.txt", blogname, iPage);
+		String filename = String.format("%1$s\\%2$s%3$03d.txt", saveDirectory,
+				blogname, iPage);
 		try {
 			OutputStreamWriter out = new OutputStreamWriter(
 					new BufferedOutputStream(new FileOutputStream(filename)),
 					"UTF-8");
-			out.write("AUTHOR: ");
-			out.write(author);
-			out.write("\r\n");
-			out.write("TITLE: ");
-			out.write(blogtitle);
-			out.write("\r\n");
-			out.write("DATE: ");
-			out.write(getNotTime());
-			out.write("\r\n");
-			out.write("-----\r\n");
+//			out.write("AUTHOR: ");
+//			out.write(author);
+//			out.write("\r\n");
+//			out.write("TITLE: ");
+//			out.write(blogtitle);
+//			out.write("\r\n");
+//			out.write("DATE: ");
+//			out.write(getNowTime());
+//			out.write("\r\n");
+//			out.write("-----\r\n");
 
 			for (int i = 0; i < size; i++) {
+				if(i >0 )
+				{
+				}				
 				BlogPage bp = bpList.get(i);
-				out.write("<title>");
-				out.write(EncodeHTML.encodeHTML(bp.title));
 				out.write("TITLE: ");
+				out.write(bp.title);
+				out.write("\r\n");
+				out.write("AUTHOR: ");
+				out.write(author);
 				out.write("\r\n");
 				out.write("DATE: ");
 				out.write(bp.datetime);
 				out.write("\r\n");
-				out.write("BODY:");
-				out.write(EncodeHTML.encodeHTML(bp.content));
 				out.write("-----\r\n");
+				out.write("BODY:");
+				out.write("\r\n");
+				out.write(bp.content);
+				//out.write(EncodeHTML.encodeHTML(bp.title));
+				out.write("\r\n");
+				//out.write("-----\r\n");
+				//再來是COMMENT:
+//				out.write("\r\n");
+
+				//out.write(EncodeHTML.encodeHTML(bp.content));
+				out.write("-----\r\n");
+				out.write("--------\r\n");
 			}
-			out.write("-----\r\n");
-			out.write("--------\r\n");
+
 			out.flush();
 			out.close();
 		} catch (java.io.IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public void output(String outputtype, String author, String blogentry, ArrayList<BlogPage> bpList) {
-		if(outputtype.toLowerCase().equals("rss"))
-			rssOut( blogentry, bpList);
-		if(outputtype.toLowerCase().equals("mt"))
+
+	public void output(String outputtype, String author, String blogentry,
+			ArrayList<BlogPage> bpList) {
+		if (outputtype.toLowerCase().equals("RSS")) {
+			rssOut(blogentry, bpList);
+		}
+
+		if (outputtype.toLowerCase().equals("HTML")) {
+			htmlOut(blogentry, bpList);
+		}
+
+		if (outputtype.toLowerCase().equals("MT")) {
 			mtOut(author, blogentry, bpList);
+		}
 	}
-		
+
 	protected void rssOut(String blogentry, ArrayList<BlogPage> bpList) {
-		rssOutPages(blogentry, bpList, "");
+		rssOutPages(blogentry, bpList, "1");
 	}
-	
-	public void outputPages(String outputtype, String author, String blogentry, ArrayList<BlogPage> bpList, String page)
-	{
-		if(outputtype.toLowerCase().equals("rss"))
-			rssOutPages( blogentry, bpList, page);
-		if(outputtype.toLowerCase().equals("mt"))
+
+	protected void htmlOut(String blogentry, ArrayList<BlogPage> bpList) {
+		htmlOutPages(blogentry, bpList, "1");
+	}
+
+	public void outputPages(String outputtype, String author, String blogentry,
+			ArrayList<BlogPage> bpList, String page) {
+		if (outputtype.toLowerCase().equals("rss")) {
+			rssOutPages(blogentry, bpList, page);
+		}
+		if (outputtype.toLowerCase().equals("html")) {
+			htmlOutPages(blogentry, bpList, page);
+		}
+		if (outputtype.toLowerCase().equals("mt")) {
 			mtOutPages(author, blogentry, bpList, page);
+		}
 	}
-	
-	protected void rssOutPages(String blogentry, ArrayList<BlogPage> bpList, String page) {
+
+	protected void rssOutPages(String blogentry, ArrayList<BlogPage> bpList,
+			String page) {
 		int size = bpList.size();
-		int iPage= Integer.parseInt(page);
-		int lastIndex=blogentry.lastIndexOf('/')+1;
+		int iPage = Integer.parseInt(page);
+		int lastIndex = blogentry.lastIndexOf('/') + 1;
 		String blogname = blogentry.substring(lastIndex, blogentry.length());
-		String filename = String.format("%1$s%2$03d.rss", blogname, iPage);
-		
+		String filename = String.format("%1$s\\%2$s%3$03d.rss", saveDirectory,
+				blogname, iPage);
+
 		try {
 			OutputStreamWriter out = new OutputStreamWriter(
 					new BufferedOutputStream(new FileOutputStream(filename)),
@@ -151,14 +191,14 @@ public abstract class AbstractBlogExtractor {
 				out.write("<item>\r\n");
 				out.write("<title>");
 				out.write(EncodeHTML.encodeHTML(bp.title));
-				//out.write("<![CDATA[" + bp.title + "]]>");
+				// out.write("<![CDATA[" + bp.title + "]]>");
 				out.write("</title>\r\n");
 				out.write("<pubDate>");
 				out.write(bp.datetime);
 				out.write("</pubDate>\r\n");
 				out.write("<description>");
 				out.write(EncodeHTML.encodeHTML(bp.content));
-				//out.write("<![CDATA[" + bp.content + "]]>");
+				// out.write("<![CDATA[" + bp.content + "]]>");
 				out.write("</description>\r\n");
 				out.write("</item>\r\n");
 			}
@@ -171,11 +211,54 @@ public abstract class AbstractBlogExtractor {
 		}
 	}
 
+	protected void htmlOutPages(String blogentry, ArrayList<BlogPage> bpList,
+			String page) {
+		int size = bpList.size();
+		int iPage = Integer.parseInt(page);
+		int lastIndex = blogentry.lastIndexOf('/') + 1;
+		String blogname = blogentry.substring(lastIndex, blogentry.length());
+		String filename = String.format("%1s\\%2$s%3$03d.html", saveDirectory,
+				blogname, iPage);
+
+		try {
+			OutputStreamWriter out = new OutputStreamWriter(
+					new BufferedOutputStream(new FileOutputStream(filename)),
+					"UTF-8");
+			out.write("<html>\r\n");
+			out.write("<head>\r\n");
+			out.write("<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />");
+			out.write("\t<title>");
+			out.write(blogtitle);
+			out.write("</title>\r\n");
+			out.write("\t<link>");
+			out.write(blogentry);
+			out.write("</link>\r\n");
+			out.write("\t<description>");
+			out.write(blogdescription);
+			out.write("\t</description>\r\n");
+			out.write("</head>\r\n");
+			out.write("<body>\r\n");
+
+			for (int i = 0; i < size; i++) {
+				BlogPage bp = bpList.get(i);
+				out.write("<h1><a href=\""+bp.url+"\">"+bp.title+"</a></h1>\r\n");
+				out.write(bp.content);
+			}
+			out.write("</body>\r\n");
+			out.write("</html>\r\n");
+			out.flush();
+			out.close();
+		} catch (java.io.IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public String getBodyHtml(String url) throws ParserException {
 		String bodyhtml;
 		// System.out.println(url);
 		Parser parser = new Parser(url);
 		NodeList body = parser.extractAllNodesThatMatch(new NodeFilter() {
+
 			private static final long serialVersionUID = 1L;
 
 			public boolean accept(Node node) {
@@ -195,6 +278,7 @@ public abstract class AbstractBlogExtractor {
 		parser.setInputHTML(stringHtml);
 
 		NodeList divList = parser.extractAllNodesThatMatch(new NodeFilter() {
+
 			private static final long serialVersionUID = 1L;
 
 			public boolean accept(Node node) {
@@ -220,6 +304,7 @@ public abstract class AbstractBlogExtractor {
 		parser.setInputHTML(stringHtml);
 
 		NodeList divList = parser.extractAllNodesThatMatch(new NodeFilter() {
+
 			private static final long serialVersionUID = 1L;
 
 			public boolean accept(Node node) {
@@ -238,6 +323,22 @@ public abstract class AbstractBlogExtractor {
 		return content.trim();
 	}
 
+	public String getTitle(String stringHtml) throws ParserException {
+		Parser parser = new Parser();
+		parser.setInputHTML(stringHtml);
+		org.htmlparser.visitors.HtmlPage htmlPage = new org.htmlparser.visitors.HtmlPage(
+				parser);
+		return htmlPage.getTitle();
+	}
+
+	/**
+	 * Get Span Content Text
+	 * 
+	 * @param stringHtml
+	 * @param classname
+	 * @return
+	 * @throws ParserException
+	 */
 	public String getSpanContentText(String stringHtml, String classname)
 			throws ParserException {
 		String content = null;
@@ -245,6 +346,7 @@ public abstract class AbstractBlogExtractor {
 		parser.setInputHTML(stringHtml);
 
 		NodeList spanList = parser.extractAllNodesThatMatch(new NodeFilter() {
+
 			private static final long serialVersionUID = 1L;
 
 			public boolean accept(Node node) {
@@ -270,6 +372,7 @@ public abstract class AbstractBlogExtractor {
 		parser.setInputHTML(stringHtml);
 
 		NodeList tableList = parser.extractAllNodesThatMatch(new NodeFilter() {
+
 			private static final long serialVersionUID = 1L;
 
 			public boolean accept(Node node) {
@@ -294,6 +397,7 @@ public abstract class AbstractBlogExtractor {
 		parser.setInputHTML(stringHtml);
 
 		NodeList linkList = parser.extractAllNodesThatMatch(new NodeFilter() {
+
 			private static final long serialVersionUID = 1L;
 
 			public boolean accept(Node node) {
@@ -308,6 +412,7 @@ public abstract class AbstractBlogExtractor {
 		Parser parser = new Parser();
 		parser.setInputHTML(stringHtml);
 		NodeList images = parser.extractAllNodesThatMatch(new NodeFilter() {
+
 			private static final long serialVersionUID = 1L;
 
 			public boolean accept(Node node) {
@@ -326,6 +431,7 @@ public abstract class AbstractBlogExtractor {
 		Parser parser = new Parser();
 		parser.setInputHTML(stringHtml);
 		NodeList links = parser.extractAllNodesThatMatch(new NodeFilter() {
+
 			private static final long serialVersionUID = 1L;
 
 			public boolean accept(Node node) {
@@ -340,11 +446,11 @@ public abstract class AbstractBlogExtractor {
 		return urls;
 	}
 
-	
 	public String[] getTableContents(String stringHtml) throws ParserException {
 		Parser parser = new Parser();
 		parser.setInputHTML(stringHtml);
 		NodeList tables = parser.extractAllNodesThatMatch(new NodeFilter() {
+
 			private static final long serialVersionUID = 1L;
 
 			public boolean accept(Node node) {
@@ -358,5 +464,4 @@ public abstract class AbstractBlogExtractor {
 		}
 		return strTables;
 	}
-
 }
