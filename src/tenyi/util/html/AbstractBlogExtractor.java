@@ -254,6 +254,10 @@ public abstract class AbstractBlogExtractor {
 	}
 
 	public String getBodyHtml(String url) throws ParserException {
+		if(url == null)
+		{
+			return null;
+		}
 		String bodyhtml;
 		// System.out.println(url);
 		Parser parser = new Parser(url);
@@ -287,11 +291,17 @@ public abstract class AbstractBlogExtractor {
 		});
 
 		for (int i = 0; i < divList.size(); i++) {
+			try
+			{
 			String divHtml = divList.elementAt(i).getText();
 
 			if (divHtml.contains("class=\"" + classname + "\"")) {
 				content = divList.elementAt(i).toHtml();
 				break;
+			}
+			}catch(Exception ex)
+			{
+				System.out.println(ex);
 			}
 		}
 		return content;
