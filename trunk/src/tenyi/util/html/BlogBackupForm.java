@@ -174,7 +174,7 @@ public class BlogBackupForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbChoostDirectoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbChoostDirectoryActionPerformed
-    	javax.swing.filechooser.FileSystemView fv =javax.swing.filechooser.FileSystemView.getFileSystemView();
+//    	javax.swing.filechooser.FileSystemView fv =javax.swing.filechooser.FileSystemView.getFileSystemView();
         
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
